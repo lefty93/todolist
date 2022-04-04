@@ -1,47 +1,33 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const { append } = require("express/lib/response");
-const { application } = require("express");
 
 const app = express();
 
+
+
+let items = ["Buy food", "Cook Food", "Eat Food"];
+
 app.set('view engine', 'ejs');
 
-app.get('/', (req, res) => {
-    var today = new Date();
-    var currentDay = today.getDay();
-    var day = "";
-    switch (currentDay) {
-        case 0:
-            day = "Sunday"
-            break;
-        case 1:
-            day = "Monday"
-            break;
-        case 2:
-            day = "Tuesday"
-            break;
-        case 3:
-            day = "Wednesday"
-            break;
-        case 4:
-            day = "Thursday"
-            break;
-        case 5:
-            day = "Friday"
-            break;
-        case 6:
-            day = "Saturday"
-            break;
-        default:
-            console.log("Erro: Current day is equal to: " + currentDay);
-            break;
-    }
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public'));
 
-    res.render("list", { kindOfDay: day });
+app.get('/', (req, res) => {
+
+    let options = { weekday: 'long', month: 'long', day: 'numeric' };
+    let today = new Date();
+    let day = today.toLocaleDateString("en-US", options);
+
+    res.render("list", { kindOfDay: day, newListItems: items });
 });
 
+app.post('/', (req, res) => {
+    let item = req.body.newItems;
+    items.push(item);
+    res.redirect('/');
+})
 app.listen(3000, () => {
     console.log("Port is listening at 3000")
 
 })
+
